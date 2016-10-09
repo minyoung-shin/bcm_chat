@@ -14,10 +14,14 @@ block content
 						label PASSWORD
 						input(type='text' name='pass' class='form-control' id='pass')
 					div.form-group
-						div.radio
-							label
-								input(type='radio' name='gender' value='m') 
-					input(type='button' class='btn btn-primary pull-right' value='SIGN UP' d='signUpBtn')
+						label(style='display: block;') GENDER
+						div.radio-inline
+							input(type='radio' name='gender' value='M' checked)
+							| Male
+						div.radio-inline
+							input(type='radio' name='gender' value='F')
+							| Female
+					input(type='button' class='btn btn-primary pull-right' value='SIGN UP' id='signUpBtn')
 
 	script.
 		$(document).ready(function() {

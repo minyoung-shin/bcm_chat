@@ -33,7 +33,7 @@ block content
 						$.each(data.memberList, function(index) {
 							var html = '<tr>'
 									 + '	<td>' + this.id + '</td>'
-									 + '	<td><a href="javascript:addFriend(\'' + this.id + '\')" class="btn btn-primary btn-xs">추가</a></td>'
+									 + '	<td><a href="javascript:addFriend(\'' + this.id + '\', \'' + this.gender + '\')" class="btn btn-primary btn-xs">추가</a></td>'
 									 + '</tr>';
 									 
 							$('table > tbody:last').append(html);
@@ -51,11 +51,14 @@ block content
 			$('title').html('친구찾기');
 		}
 		
-		function addFriend(friendId) {
+		function addFriend(friendId, friendGender) {
 			$.ajax({
 				type: 'get',
 				dataType: 'json',
-				data: { friendId: friendId },
+				data: { 
+					friendId: friendId, 
+					friendGender: friendGender 
+				},
 				url: '/friend/add',
 				success: function(data) { 
 					opener.parent.location.reload();

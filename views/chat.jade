@@ -26,7 +26,10 @@ block content
 							td
 								span.label.label-warning.left-margin.hidden(id='#{val.friendId}') 접속중
 							td
-								img(src='http://image.flaticon.com/icons/svg/145/145857.svg' class='img-circle')
+								if val.friendGender == 'F'
+									img(src='http://image.flaticon.com/icons/svg/145/145862.svg' class='img-circle')
+								else 
+									img(src='http://image.flaticon.com/icons/svg/145/145857.svg' class='img-circle')
 							td.cursor(onclick='viewChatRoom(\'' + val.friendId + '\')')= val.friendId								
 							td
 								span.glyphicon.glyphicon-remove.cursor(onclick='deleteFriend(\'' + val.friendId + '\')')

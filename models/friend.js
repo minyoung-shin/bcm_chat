@@ -4,6 +4,7 @@ var Schema 	 = mongoose.Schema;
 var friendSchema = new Schema({
     id: String,
     friendId: String,
+    friendGender: String,
     createDate: { type: Date, default: Date.now }
 });
 

@@ -45,8 +45,9 @@ exports.goSignUp = function(req, res) {
 
 exports.signUp = function(req, res) {
 	new Member({
-		id : req.body.id,
-		pass : req.body.pass		
+		id: req.body.id,
+		pass: req.body.pass,
+		gender: req.body.gender
 	}).save();
 			
 	res.json({site: '/member/login'});
@@ -61,7 +62,8 @@ exports.searchFriend = function(req, res) {
 exports.addFriend = function(req, res) {
 	new Friend({
 		id: req.session.userId,
-		friendId: req.query.friendId		
+		friendId: req.query.friendId,		
+		friendGender: req.query.friendGender		
 	}).save();
 	
 	res.json({result: null});
