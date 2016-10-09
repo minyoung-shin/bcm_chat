@@ -88,12 +88,11 @@ exports.saveMsg = function(req, res) {
 exports.viewMsg = function(req, res) {
 	if(req.params.type == 'send') {
 		Chat.find({from: req.session.userId}).sort({createDate: -1}).exec(function(err, chats) {
-			res.render('viewMsg', {sendMsgList : chats, type: 'send'});			
+			res.render('viewMsg', {sendMsgList: chats, type: 'send'});			
 		});
 	} else {
 		Chat.find({to: req.session.userId}).sort({createDate: -1}).exec(function(err, chats) {
-			res.render('viewMsg', {receiveMsgList : chats, type: 'receive'});			
+			res.render('viewMsg', {receiveMsgList: chats, type: 'receive'});			
 		});
 	}
-	
 };

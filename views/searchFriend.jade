@@ -55,10 +55,7 @@ block content
 			$.ajax({
 				type: 'get',
 				dataType: 'json',
-				data: { 
-					friendId: friendId, 
-					friendGender: friendGender 
-				},
+				data: {friendId: friendId, friendGender: friendGender},
 				url: '/friend/add',
 				success: function(data) { 
 					opener.parent.location.reload();
