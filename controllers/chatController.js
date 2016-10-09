@@ -2,8 +2,6 @@ var Member = require('../models/member.js');
 var Friend = require('../models/friend.js');
 var Chat   = require('../models/chat.js');
 
-// 메인 페이지로 갈 때 주소 표시줄
-
 exports.list = function(req, res) {
 	if(req.session.userId == null) {
 		res.render('login');

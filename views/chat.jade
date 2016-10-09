@@ -18,7 +18,7 @@ block content
 						span.glyphicon.glyphicon-envelope(aria-hidden='true') 
 						|  메시지 보기
 		div.row
-			div.col-lg-12#friendWrap
+			div.col-lg-6#friendWrap
 				h4 친구목록		
 				table.table#chatTable
 					each val in friendList
@@ -36,15 +36,8 @@ block content
 					if friendList == '' 
 						tr
 							td(colspan='3') 친구를 추가해주세요^^
-			div.hidden#chatWrap
-				h4 채팅목록	
-				div.panel.panel-primary
-					div.panel-heading
-						h3.panel-title
-					div.panel-body(style='height: 400px; overflow: auto;')
-					div.panel-footer
-						div
-							input.form-control#content(type='text')
+			div.col-lg-6#chatWrap
+				h4 채팅목록
 						
 	script.
 		var socket = io.connect();
@@ -62,9 +55,12 @@ block content
 
 			// 한사람에게 메시지 받기
 			socket.on('broadcastMsg', function(data) {
-				viewChatRoom(data.fromId);
-				$('.panel-body').append('<p class="msg-bubbles"><span class="bg-warning">' + data.fromId + ' : ' + data.content + '</span></p>');
-				$('.panel-body').scrollTop(370);
+				// 채팅방이 없을 때 띄우기
+				if($('#to_'+data.fromId).length == 0) {
+					viewChatRoom(data.fromId);
+				}
+				
+				$('#to_'+data.fromId).parent().prev().append('<p class="msg-bubbles"><span class="bg-warning">' + data.fromId + ' : ' + data.content + '</span></p>');
 			});
 												 
 			$('.dropdown-toggle').click(function() {
@@ -73,36 +69,37 @@ block content
 				} else {
 					$('.dropdown-menu').show();
 				}				
-			})
-			
-			// 메시지 입력
-			$("#content").keypress(function(e) {
-				if(e.keyCode == 13) {
-					var to 	 	= $('.panel-title').html();
-					var content = $('#content').val();
-
-					if(content == '') {
-						alert('메시지 내용을 입력해 주세요');
-						$('#content').focus();
-
-						return false;
-					}
-
-					$('.panel-body').append('<p class="text-right msg-bubbles"><span class="bg-info">#{id}' + ' : ' + content + '</span></p>');
-
-					$.ajax({
-						url: '/message/save',
-						type: 'get',
-						dataType: 'json',
-						data: {to: to, content: content},
-						success: function(data) { 
-							$('#content').val('');
-							socket.emit('sendMsg', {fromId: '#{id}', toId: to, content: content});
-						}
-					});
-				}
 			});
 		});
+		
+		// 메시지 입력
+		function inputContent(e, obj) {
+			if(e.keyCode == 13) {
+				var toBefore = $(obj).attr('id');
+				var to 	 	 = toBefore.substring(3, toBefore.length);
+				var content  = $(obj).val();
+
+				if(content == '') {
+					alert('메시지 내용을 입력해 주세요');
+					$(obj).focus();
+
+					return false;
+				}
+
+				$(obj).parent().prev().append('<p class="text-right msg-bubbles"><span class="bg-info">#{id}' + ' : ' + content + '</span></p>');
+
+				$.ajax({
+					url: '/message/save',
+					type: 'get',
+					dataType: 'json',
+					data: {to: to, content: content},
+					success: function(data) { 
+						$(obj).val('');
+						socket.emit('sendMsg', {fromId: '#{id}', toId: to, content: content});
+					}
+				});
+			}
+		}
 		
 		// 친구제거
 		function deleteFriend(friendId) {
@@ -119,7 +116,11 @@ block content
 		
 		// 채팅방 열기
 		function viewChatRoom(friendId) {
-			$('#friendWrap').attr('class', 'col-lg-6');
-			$('#chatWrap').attr('class', 'col-lg-6 show');
-			$('.panel-title').html(friendId);
+			var html = '<div class="panel panel-primary">'
+					 + '	<div class="panel-heading">' + friendId + '</div>'
+					 + '	<div class="panel-body"></div>'
+					 + '	<div class="panel-footer"><input class="form-control" id="to_' + friendId + '" type="text" onkeypress="inputContent(event, this)"></div>'
+					 + '</div>'
+					 
+			$('#chatWrap').append(html);
 		}
