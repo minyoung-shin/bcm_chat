@@ -1,0 +1,20 @@
+extends layout
+
+block content
+	div.container
+		h1.text-center(style='margin-top: 150px;') LOG IN
+		div.row
+			div.col-lg-12
+				form(action='/member/login' method='post')
+					div.form-group
+						label ID
+						input(type='text' name='id' class='form-control')
+					div.form-group
+						label PASSWORD
+						input(type='password' name='pass' class='form-control')
+					button(type='submit' class='btn btn-primary pull-right') LOGIN
+					a(href='/member/signUp' class='btn btn-warning pull-right btn-right-margin') SIGN UP
+	script.
+		if('#{result}' == 'false') {
+			alert('존재하지 않는 회원입니다');
+		}

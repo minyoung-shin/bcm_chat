@@ -1,0 +1,51 @@
+extends layout
+
+block content
+	div.container 
+		ul.nav.nav-tabs.list
+			li(role="presentation")
+				a(href="/message/view/receive") 받은 메시지
+			li(role="presentation")
+				a(href="/message/view/send") 보낸 메시지
+			div.input-group.pull-right(style='width: 40%;')
+				input.form-control#content(type='text')
+				span.input-group-addon.glyphicon.glyphicon-search(aria-hidden='true' style='top: 0px')
+		table.table.list
+			if type == 'send'
+				tr.warning
+					th 받는사람
+					th 내용
+					th 보낸날짜
+				each val in sendMsgList
+					tr
+						td= val.to
+						td= val.content
+						td= dateToString(val.createDate)			
+			if type == 'receive'
+				tr.warning
+					th 보낸사람
+					th 내용
+					th 보낸날짜
+				each val in receiveMsgList
+					tr
+						td= val.from
+						td= val.content
+						td= dateToString(val.createDate)
+
+			-function dateToString(d) {
+				-var date = new Date(d);  
+				-return date.getFullYear() + '/' + (date.getMonth()+1) + '/' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
+			-}
+	script.
+		$(document).ready(function() {
+			// 상단메뉴 선택 css 변경
+			if('#{type}' == 'receive') {
+				$('ul li:nth-child(1)').addClass('active');
+			} else {
+				$('ul li:nth-child(2)').addClass('active');
+			}
+		});
+
+		window.onload = function() {
+			 $('title').html('메시지 보기');
+		}

@@ -1,0 +1,65 @@
+extends layout
+
+block content
+	div.container
+		div.row.list
+			div.col-lg-12
+				div.input-group
+					input(type='text' id='keyword' placeholder='id' class='form-control')
+					span(class='input-group-addon cursor' id='searchBtn') 친구찾기
+
+		div.row.list
+			div.col-lg-12
+				h5 검색결과
+			div.col-lg-12
+				table.table.table-striped
+					tr 
+						th(width='80%') ID
+						th 추가
+					tr
+						td(colspan='2') 검색을 해주세요
+						
+	script.
+		$(document).ready(function() {
+			$('#searchBtn').click(function() {
+				$.ajax({
+					type: 'post',
+					dataType: 'json',
+					data: { keyword: $('#keyword').val() },
+					url: '/friend/search',
+					success: function(data) { 
+						$('table tr:not(:first)').remove(); 
+
+						$.each(data.memberList, function(index) {
+							var html = '<tr>'
+									 + '	<td>' + this.id + '</td>'
+									 + '	<td><a href="javascript:addFriend(\'' + this.id + '\')" class="btn btn-primary btn-xs">추가</a></td>'
+									 + '</tr>';
+									 
+							$('table > tbody:last').append(html);
+						});
+						
+						if(data.memberList == 0) {
+							$('table > tbody:last').append('<tr><td colspan="2">검색결과가 없습니다</td></tr>');
+						}
+					}
+				});
+			});
+		});
+
+		window.onload = function () {
+			$('title').html('친구찾기');
+		}
+		
+		function addFriend(friendId) {
+			$.ajax({
+				type: 'get',
+				dataType: 'json',
+				data: { friendId: friendId },
+				url: '/friend/add',
+				success: function(data) { 
+					opener.parent.location.reload();
+					window.close();
+				}
+			});
+		}

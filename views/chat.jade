@@ -1,0 +1,122 @@
+extends layout
+
+block content
+	div.container
+		nav.navbar.navbar-default
+			div.container-fluid
+				div.pull-right
+					div.btn-group
+						button(type='button' class='btn btn-primary dropdown-toggle btn-right-margin' data-toggle='dropdown' aria-expanded='false') #{id} 
+							span.caret
+						ul.dropdown-menu(role='menu')
+							li
+								a(href='/member/logout' onclick='javascript:socket.emit("logout", {loginId: "#{id}"});') LOGOUT
+					button(class='btn btn-default navbar-btn btn-right-margin' onclick='javascript:window.open("/friend/search", "", "width=300, height=400;");') 
+						span.glyphicon.glyphicon-search(aria-hidden='true') 
+						|  친구찾기
+					button(class='btn btn-default navbar-btn' onclick='javascript:window.open("/message/view/receive", "", "width=600, height=300;");') 
+						span.glyphicon.glyphicon-envelope(aria-hidden='true') 
+						|  메시지 보기
+		div.row
+			div.col-lg-12#friendWrap
+				h4 친구목록		
+				table.table#chatTable
+					each val in friendList
+						tr
+							td
+								span.label.label-warning.left-margin.hidden(id='#{val.friendId}') 접속중
+							td
+								img(src='http://image.flaticon.com/icons/svg/145/145857.svg' class='img-circle')
+							td.cursor(onclick='viewChatRoom(\'' + val.friendId + '\')')= val.friendId								
+							td
+								span.glyphicon.glyphicon-remove.cursor(onclick='deleteFriend(\'' + val.friendId + '\')')
+					if friendList == '' 
+						tr
+							td(colspan='3') 친구를 추가해주세요^^
+			div.hidden#chatWrap
+				h4 채팅목록	
+				div.panel.panel-primary
+					div.panel-heading
+						h3.panel-title
+					div.panel-body(style='height: 400px; overflow: auto;')
+					div.panel-footer
+						div
+							input.form-control#content(type='text')
+						
+	script.
+		var socket = io.connect();
+		
+		$(document).ready(function() {
+			// 소켓에 접속한거 알리기
+			socket.emit('login', {loginId: '#{id}'});
+			
+			// 로그인한 사용자 표시
+			socket.on('broadcastLoginList', function(data) {
+				$.each(data.loginList, function() {
+					$('#'+this.loginId).attr('class', 'label label-warning left-margin show');
+				});
+			});
+
+			// 한사람에게 메시지 받기
+			socket.on('broadcastMsg', function(data) {
+				viewChatRoom(data.fromId);
+				$('.panel-body').append('<p class="msg-bubbles"><span class="bg-warning">' + data.fromId + ' : ' + data.content + '</span></p>');
+				$('.panel-body').scrollTop(370);
+			});
+												 
+			$('.dropdown-toggle').click(function() {
+				if($('.dropdown-menu').css('display') == 'block') {
+					$('.dropdown-menu').hide();
+				} else {
+					$('.dropdown-menu').show();
+				}				
+			})
+			
+			// 메시지 입력
+			$("#content").keypress(function(e) {
+				if(e.keyCode == 13) {
+					var to 	 	= $('.panel-title').html();
+					var content = $('#content').val();
+
+					if(content == '') {
+						alert('메시지 내용을 입력해 주세요');
+						$('#content').focus();
+
+						return false;
+					}
+
+					$('.panel-body').append('<p class="text-right msg-bubbles"><span class="bg-info">#{id}' + ' : ' + content + '</span></p>');
+
+					$.ajax({
+						url: '/message/save',
+						type: 'get',
+						dataType: 'json',
+						data: {to: to, content: content},
+						success: function(data) { 
+							$('#content').val('');
+							socket.emit('sendMsg', {fromId: '#{id}', toId: to, content: content});
+						}
+					});
+				}
+			});
+		});
+		
+		// 친구제거
+		function deleteFriend(friendId) {
+			$.ajax({
+				url: '/friend/delete',
+				type: 'get',
+				dataType: 'json',
+				data: {friendId: friendId},
+				success: function(data) { 
+					location.replace("/");
+				}
+			});
+		}
+		
+		// 채팅방 열기
+		function viewChatRoom(friendId) {
+			$('#friendWrap').attr('class', 'col-lg-6');
+			$('#chatWrap').attr('class', 'col-lg-6 show');
+			$('.panel-title').html(friendId);
+		}

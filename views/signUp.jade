@@ -1,0 +1,59 @@
+extends layout
+
+block content
+	div.container
+		h1.text-center(style='margin-top: 150px;') SIGN UP
+		div.row
+			div.col-lg-12
+				form#signUpForm
+					div.form-group
+						label ID
+						input(type='text' name='id' class='form-control' id='id')
+					div#resultDiv.form-group(style='text-align: right; margin-top: 5px;')
+					div.form-group
+						label PASSWORD
+						input(type='text' name='pass' class='form-control' id='pass')
+					div.form-group
+						div.radio
+							label
+								input(type='radio' name='gender' value='m') 
+					input(type='button' class='btn btn-primary pull-right' value='SIGN UP' d='signUpBtn')
+
+	script.
+		$(document).ready(function() {
+			$("input[name=id]").keyup(function() {
+				var inputId = $("input[name=id]").val();
+				
+				$.ajax({
+					url: "/member/signUp",
+					type: "get",
+					dataType: "json",
+					data: {id: $("input[name=id]").val()},
+					success: function(data) { 
+						if(data.result == "1") {
+							$("#resultDiv").css("color", "red").html("사용 중인 ID 입니다");
+						} else {
+							$("#resultDiv").css("color", "green").html("사용 가능한 ID 입니다");
+						}
+					}
+				});
+			});
+			
+			$("#signUpBtn").click(function() {
+				if($("#id").val() == "" || $("#pass").val() == '' || $("#resultDiv").html() == "사용 중인 ID 입니다") {
+					alert("올바른 값을 입력해주세요");
+					return false;
+				} else {
+					$.ajax({
+						url: "/member/signUp",
+						type: "post",
+						dataType: "json",
+						data: $('#signUpForm').serialize(),
+						success: function(data) {
+							alert('회원가입이 완료되었습니다.');
+							window.location = data.site;
+						}
+					});
+				}
+			});
+		});
